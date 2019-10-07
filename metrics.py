@@ -210,8 +210,8 @@ class Graphs:
     if legend:
       plt.legend(fontsize ='medium')
     plt.grid(False)
-    if double is False:
-      plt.show()
+    #if double is False:
+      #plt.show()
 
   def plot_all(self, fill = True, legend = True, threshold = False,methods=None):
     plt.style.use("tableau-colorblind10")
