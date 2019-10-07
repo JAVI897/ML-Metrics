@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Oct  6 18:21:45 2019
-
-@author: Aida
-"""
-
 import matplotlib.pyplot as plt
-from sklearn.metrics import classification_report, precision_recall_curve, roc_auc_score
 import numpy as np
 import pandas as pd
 import math
 import seaborn as sns
-import csv
-
 
 class Metrics:
 
@@ -124,7 +115,7 @@ class Graphs:
   
   def plot_ROC(self, fill = False, legend = True, double = False, threshold = False,methods=None):
     if double is False:
-      plt.style.use("tableau-colorblind10")
+      plt.style.use("ggplot")
       plt.figure(figsize = (9, 9))
     for i, (Y_test, prediction) in enumerate(self.data):
       metrics = Metrics(Y_test, prediction)
@@ -176,7 +167,7 @@ class Graphs:
 
   def plot_PRC(self, fill = False, legend = True, double = False, threshold = False, methods=None):
     if double is False:
-      plt.style.use("tableau-colorblind10")
+      plt.style.use("ggplot")
       plt.figure(figsize = (9, 9))
     for i, (Y_test, prediction) in enumerate(self.data):
       metrics = Metrics(Y_test, prediction)
@@ -214,8 +205,8 @@ class Graphs:
       #plt.show()
 
   def plot_all(self, fill = True, legend = True, threshold = False,methods=None):
-    plt.style.use("tableau-colorblind10")
-    plt.figure(figsize = (19, 15))
+    plt.style.use("ggplot")
+    plt.figure(figsize = (15, 20))
     plt.subplot(2,2,1)
     self.plot_PRC(double=True, threshold = threshold, legend = legend,methods=methods)
     plt.subplot(2,2,2)

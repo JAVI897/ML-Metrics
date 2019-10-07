@@ -79,7 +79,8 @@ def grafico(option_threshold,option_fill,option_legend,methods):
         
     elif option_curve == "Both":
         g=graphs.plot_all(threshold= option_threshold, fill=option_fill,methods=methods,legend=option_legend)        
-        return st.pyplot(g)
+        return st.pyplot(g, transparent = True, optimize = True,
+                              quality = 100, bbox_inches="tight")
 
 def methods_prc():
     option_method=st.multiselect("Methods:",df_methods_prc["model"])
