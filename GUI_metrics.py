@@ -60,7 +60,7 @@ def configuration():
     return threshold,fill,legend
 
 def configuration_report():
-    
+    colormap = True
     if st.sidebar.checkbox("Show settings"):
         #colormap
         option_colormap = st.sidebar.selectbox("Colormap",df_binary["colormap"])
