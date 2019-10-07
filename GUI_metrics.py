@@ -71,11 +71,13 @@ def configuration_report():
 def grafico(option_threshold,option_fill,option_legend,methods):
     if option_curve == "ROC Curve":
         g=graphs.plot_ROC(threshold= option_threshold, fill=option_fill,methods=methods,legend=option_legend)
-        return st.pyplot(g)
+        return st.pyplot(g, transparent = True, optimize = True,
+                              quality = 100, bbox_inches="tight")
         
     elif option_curve == "PRC Curve":
         g=graphs.plot_PRC(threshold= option_threshold, fill=option_fill, methods=methods,legend=option_legend)
-        return st.pyplot(g)
+        return st.pyplot(g, transparent = True, optimize = True,
+                              quality = 100, bbox_inches="tight")
         
     elif option_curve == "Both":
         g=graphs.plot_all(threshold= option_threshold, fill=option_fill,methods=methods,legend=option_legend)        
