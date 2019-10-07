@@ -11,6 +11,11 @@ import numpy as np
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report, precision_recall_curve, roc_auc_score
+import pandas as pd
+import math
+import seaborn as sns
+import csv
 
 
 prediction_1=np.load("prediction_1.npy")
@@ -24,9 +29,11 @@ optimum= metrics.Optimum(Y_Test_1,prediction_1)
 #DATAFRAMES
 df_binary= pd.DataFrame({"threshold":["No","Yes"],
                   "fill":["No","Yes"],
-                  "legend":["Yes","No"]})
+                  "legend":["Yes","No"],
+                  "colormap":["Yes", "No"]})
 
 df_curves=pd.DataFrame({"curve":["ROC Curve","PRC Curve","Both"]})
+df_graphs=pd.DataFrame({"graphs":["Precision and Recall vs Decision threshold"]})
 
 df_methods_prc= pd.DataFrame({"model":["Distance PRC","Difference Recall-Precision"]})
 df_methods_roc= pd.DataFrame({"model":["Youden","F-score", "Distance ROC","Difference Sensitivity-Specificity"]})
@@ -39,19 +46,27 @@ def configuration():
     legend=True
     if st.sidebar.checkbox("Show settings"):
         #Threshold visualization
-        option_threshold= st.sidebar.selectbox("Threshold",df_binary["threshold"])
-        if option_threshold == "Yes": 
-            threshold= True
+        option_threshold= st.sidebar.selectbox("Threshold",list(df_binary["threshold"]), index = 0)
+        threshold = True if option_threshold == "Yes" else False
 
         #Fill visualization
-        option_fill=  st.sidebar.selectbox("Fill",df_binary["fill"])
-        if option_fill == "Yes": 
-            fill= True
+        option_fill=  st.sidebar.selectbox("Fill",list(df_binary["fill"]), index = 0)
+        fill = True if option_fill == "Yes" else False
+        
         #Legend visualization
-        option_legend= st.sidebar.selectbox("Legend",df_binary["legend"])
-        if option_legend == "No": 
-            legend= False        
+        option_legend= st.sidebar.selectbox("Legend",list(df_binary["legend"]), index = 0)
+        legend = True if option_legend == "Yes" else False
+       
     return threshold,fill,legend
+
+def configuration_report():
+    
+    if st.sidebar.checkbox("Show settings"):
+        #colormap
+        option_colormap = st.sidebar.selectbox("Colormap",df_binary["colormap"])
+        colormap = True if option_colormap == "Yes" else False
+     
+    return colormap
 
 def grafico(option_threshold,option_fill,option_legend,methods):
     if option_curve == "ROC Curve":
@@ -83,6 +98,12 @@ def methods_both():
 st.sidebar.title("Report")
 report_sidebar= st.sidebar.checkbox("Show report")
 
+if report_sidebar:
+    st.title("Report")
+    colormap = configuration_report()
+    r= optimum.report(colormap=colormap)
+    st.dataframe(r) 
+    
 if not report_sidebar:
     st.sidebar.title("Curve type")
     option_curve= st.sidebar.selectbox("Select",df_curves["curve"])
@@ -109,10 +130,7 @@ if not report_sidebar:
         if option_threshold== True: methods_list_both= methods_both()
         else:methods_list_both=None
         grafico(option_threshold,option_fill,option_legend,methods_list_both)
-        
-
-else:
-    st.title("Report")
-    r= optimum.report()
-    st.dataframe(r)    
+    
+    st.sidebar.title("Other graphs")
+    option_graphs = st.sidebar.selectbox("Select",df_graphs["graphs"])
     

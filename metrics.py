@@ -225,7 +225,7 @@ class Graphs:
       self.plot_PRC(fill = True, double=True, legend = legend)
       plt.subplot(2,2,4)
       self.plot_ROC(fill = True, double=True, legend = legend)
-    plt.show()
+    #plt.show()
   
 class Optimum:
 
@@ -346,11 +346,11 @@ class Optimum:
                        "AUC":[object_youden.auc() for i in range(6)], 
                        "AP":[object_youden.ap() for i in range(6)]},
                       index = ["Youden", "F-score", "Distance_ROC", "Distance_PRC","Difference_Sensitivity_Specificity","Difference_Recall_Precision"])
-    #if colormap:
-      #cm = sns.light_palette("green", as_cmap=True)
-      #s = df.sort_values(by='Threshold',ascending=False).style\
-             #.background_gradient(cmap = cm, high = 0.5, low = -0.5, axis = 0)\
+    if colormap:
+      cm = sns.light_palette("green", as_cmap=True)
+      s = df.sort_values(by='Threshold',ascending=False).style\
+             .background_gradient(cmap = cm, high = 0.5, low = -0.5, axis = 0)
              #.set_properties(**{'width': '75px', 'text-align': 'center', 'font-size': '10pt'})
-      #return s
+      return s
 
     return df
