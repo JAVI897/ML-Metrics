@@ -16,6 +16,7 @@ import pandas as pd
 import math
 import seaborn as sns
 import csv
+import plotly.graph_objects as go
 
 
 prediction_1=np.load("prediction_1.npy")
@@ -24,6 +25,20 @@ Y_Test_1=np.load("Y_Test_1.npy")
 data = [(Y_Test_1, prediction_1)]
 graphs = metrics.Graphs(data)
 optimum= metrics.Optimum(Y_Test_1,prediction_1)
+
+prediction1_input = st.text_input("Add data", "Write your path:")
+    
+    
+#st.write(prediction1_input) 
+#if prediction1_input!= "Write your path:":
+    #prediction_1= np.load(prediction1_input)
+    #Y_Test_1=np.load("Y_Test_1.npy")
+    
+    #data = [(Y_Test_1, prediction_1)]
+    #graphs = metrics.Graphs(data)
+    #optimum= metrics.Optimum(Y_Test_1,prediction_1)
+
+
 
 
 #DATAFRAMES
@@ -39,6 +54,12 @@ df_methods_prc= pd.DataFrame({"model":["Distance PRC","Difference Recall-Precisi
 df_methods_roc= pd.DataFrame({"model":["Youden","F-score", "Distance ROC","Difference Sensitivity-Specificity"]})
 df_methods_both= pd.DataFrame({"model":["Distance PRC","Difference Recall-Precision",
                                         "Youden","F-score", "Distance ROC","Difference Sensitivity-Specificity"]})
+
+df_methods_pie_chart= pd.DataFrame({"method":["Youden","F-score","Distance_ROC",
+                                              "Distance_PRC","Difference_Sensitivity_Specificity",
+                                              "Difference_Recall_Precision"]})
+
+
 #FUNCTIONS
     
 def configuration(other_graph = False):
@@ -103,6 +124,16 @@ def other_graphics(option_graphs, option_threshold,option_legend,methods, number
         return st.pyplot(g, transparent = False, optimize = True,
                               quality = 100, bbox_inches="tight")
 
+def pie_chart(df,method):
+    dic_values={}
+    header_list=["TN","TP","FN","FP"]
+    df=df[header_list]
+    for index,value in df.iterrows():
+        v = list(df.loc[index].values)
+        dic_values[index]=v
+    
+    fig = go.Figure(data=[go.Pie(labels=header_list, values=dic_values[method], hole=.3)])
+    return fig
 
 def methods_prc():
     option_method=st.multiselect("Methods:",df_methods_prc["model"])
@@ -136,7 +167,13 @@ if report:
         st.title("Report")
         colormap = configuration_report()
         r= optimum.report(colormap=colormap)
-        st.dataframe(r) 
+        st.dataframe(r)
+        r_pie=optimum.report(colormap=False)
+        
+        st.title("Confusion matrix percentages")
+        option_method= st.selectbox("Method",df_methods_pie_chart["method"])
+        fig= pie_chart(r_pie,option_method)
+        st.plotly_chart(fig) #da error si en report colormap == True
     
 if curve_type:
     st.sidebar.title("Curve type")
@@ -179,5 +216,5 @@ if other_graphs:
         other_graphics(option_graphs, option_threshold,option_legend,methods_list, number_threshold)
             
             
-    
+
     
