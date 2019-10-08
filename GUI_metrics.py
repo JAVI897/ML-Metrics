@@ -40,24 +40,31 @@ df_methods_roc= pd.DataFrame({"model":["Youden","F-score", "Distance ROC","Diffe
 df_methods_both= pd.DataFrame({"model":["Distance PRC","Difference Recall-Precision",
                                         "Youden","F-score", "Distance ROC","Difference Sensitivity-Specificity"]})
 #FUNCTIONS
-def configuration():
+    
+def configuration(other_graph = False):
     threshold=False
     fill=False
     legend=True
+    number_threshold = 100
     if st.sidebar.checkbox("Show settings"):
         #Threshold visualization
         option_threshold= st.sidebar.selectbox("Threshold",list(df_binary["threshold"]), index = 0)
         threshold = True if option_threshold == "Yes" else False
 
         #Fill visualization
-        option_fill=  st.sidebar.selectbox("Fill",list(df_binary["fill"]), index = 0)
-        fill = True if option_fill == "Yes" else False
-        
+        if other_graph == False:
+            option_fill=  st.sidebar.selectbox("Fill",list(df_binary["fill"]), index = 0)
+            fill = True if option_fill == "Yes" else False
+        if other_graph:
+            fill = None
         #Legend visualization
         option_legend= st.sidebar.selectbox("Legend",list(df_binary["legend"]), index = 0)
         legend = True if option_legend == "Yes" else False
+        
+        number_threshold = st.sidebar.slider("Number of thresholds:", min_value = 0, 
+                                             max_value = 100, value = 100)
        
-    return threshold,fill,legend
+    return threshold,fill,legend, number_threshold
 
 def configuration_report():
     colormap = True
@@ -68,21 +75,34 @@ def configuration_report():
      
     return colormap
 
-def grafico(option_threshold,option_fill,option_legend,methods):
+def grafico(option_curve, option_threshold,option_fill,option_legend,methods, number_threshold):
+    
     if option_curve == "ROC Curve":
-        g=graphs.plot_ROC(threshold= option_threshold, fill=option_fill,methods=methods,legend=option_legend)
-        return st.pyplot(g, transparent = True, optimize = True,
+        g=graphs.plot_ROC(threshold= option_threshold, fill=option_fill,methods=methods,
+                          legend=option_legend, number_threshold = number_threshold)
+        return st.pyplot(g, transparent = False, optimize = True,
                               quality = 100, bbox_inches="tight")
         
     elif option_curve == "PRC Curve":
-        g=graphs.plot_PRC(threshold= option_threshold, fill=option_fill, methods=methods,legend=option_legend)
-        return st.pyplot(g, transparent = True, optimize = True,
+        g=graphs.plot_PRC(threshold= option_threshold, fill=option_fill, methods=methods,
+                          legend=option_legend, number_threshold = number_threshold)
+        return st.pyplot(g, transparent = False, optimize = True,
                               quality = 100, bbox_inches="tight")
         
     elif option_curve == "Both":
-        g=graphs.plot_all(threshold= option_threshold, fill=option_fill,methods=methods,legend=option_legend)        
-        return st.pyplot(g, transparent = True, optimize = True,
+        g=graphs.plot_all(threshold= option_threshold, fill=option_fill,methods=methods,
+                          legend=option_legend, number_threshold = number_threshold)        
+        return st.pyplot(g, transparent = False, optimize = True,
                               quality = 100, bbox_inches="tight")
+
+def other_graphics(option_graphs, option_threshold,option_legend,methods, number_threshold):
+    
+    if option_graphs == "Precision and Recall vs Decision threshold":
+        g=graphs.plot_precision_recall_vs_threshold(legend = option_legend, threshold = option_threshold, 
+                                                    methods=methods, number_threshold = number_threshold)
+        return st.pyplot(g, transparent = False, optimize = True,
+                              quality = 100, bbox_inches="tight")
+
 
 def methods_prc():
     option_method=st.multiselect("Methods:",df_methods_prc["model"])
@@ -96,44 +116,68 @@ def methods_both():
     option_method=st.multiselect("Methods:",df_methods_both["model"])
     return option_method 
 
+def methods_Precision_and_Recall():
+    option_method=st.multiselect("Methods:",df_methods_prc["model"])
+    return option_method 
+
 
 #INTERFACE 
-st.sidebar.title("Report")
-report_sidebar= st.sidebar.checkbox("Show report")
 
-if report_sidebar:
-    st.title("Report")
-    colormap = configuration_report()
-    r= optimum.report(colormap=colormap)
-    st.dataframe(r) 
+st.sidebar.text("Options")
+report= st.sidebar.checkbox("Report")
+curve_type = st.sidebar.checkbox("Curve type")
+other_graphs = st.sidebar.checkbox("Other graphs")
+
+if report:
+    st.sidebar.title("Report")
+    report_sidebar= st.sidebar.checkbox("Show report")
     
-if not report_sidebar:
+    if report_sidebar:
+        st.title("Report")
+        colormap = configuration_report()
+        r= optimum.report(colormap=colormap)
+        st.dataframe(r) 
+    
+if curve_type:
     st.sidebar.title("Curve type")
     option_curve= st.sidebar.selectbox("Select",df_curves["curve"])
-    option_threshold,option_fill,option_legend= configuration()
+    option_threshold,option_fill,option_legend,number_threshold= configuration()
     
     
     if option_curve == "ROC Curve": 
     
         st.title("ROC Curve")
-        if option_threshold== True: methods_list_roc= methods_roc() 
+        if option_threshold: methods_list_roc= methods_roc() 
         else:methods_list_roc=None
-        grafico(option_threshold,option_fill,option_legend,methods_list_roc)
+        grafico(option_curve, option_threshold,option_fill,option_legend,methods_list_roc, number_threshold)
     
         
     elif option_curve == "PRC Curve": 
         
         st.title("PRC Curve")  
-        if option_threshold== True: methods_list_prc= methods_prc()
+        if option_threshold: methods_list_prc= methods_prc()
         else: methods_list_prc=None
-        grafico(option_threshold,option_fill,option_legend,methods_list_prc)
+        grafico(option_curve, option_threshold,option_fill,option_legend,methods_list_prc, number_threshold)
              
     elif option_curve == "Both":
         st.title("ROC and PRC curves")
-        if option_threshold== True: methods_list_both= methods_both()
+        if option_threshold: methods_list_both= methods_both()
         else:methods_list_both=None
-        grafico(option_threshold,option_fill,option_legend,methods_list_both)
-    
+        grafico(option_curve, option_threshold,option_fill,option_legend,methods_list_both, number_threshold)
+
+if other_graphs:
     st.sidebar.title("Other graphs")
     option_graphs = st.sidebar.selectbox("Select",df_graphs["graphs"])
+    option_threshold,option_fill,option_legend,number_threshold= configuration(other_graph = True)
+    
+    if option_graphs == "Precision and Recall vs Decision threshold":
+        st.title("Precision and Recall vs Decision threshold")
+        if option_threshold: 
+            methods_list= methods_Precision_and_Recall()
+        else: 
+            methods_list=None
+        other_graphics(option_graphs, option_threshold,option_legend,methods_list, number_threshold)
+            
+            
+    
     

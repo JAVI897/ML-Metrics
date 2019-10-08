@@ -55,10 +55,10 @@ class Metrics:
     except:
       return None
 
-  def PRC_Value(self):
+  def PRC_Value(self, number_threshold = 100):
     precision = []
     recall = []
-    for i in np.linspace(1.0, 0.0, num=100):
+    for i in np.linspace(1.0, 0.0, num=number_threshold):
       aux = Metrics(self.test, self.prediction, threshold = i)
       precision_value = aux.precision()
       sensitivity_value = aux.sensitivity()
@@ -71,10 +71,10 @@ class Metrics:
     #precision, recall, _ = precision_recall_curve(self.test, self.prediction)
     return precision, recall
 
-  def ROC_Value(self):
+  def ROC_Value(self, number_threshold = 100):
     recall = []
     false_positive_rate = []
-    for i in np.linspace(1.0, 0.0, num=100):
+    for i in np.linspace(1.0, 0.0, num=number_threshold):
       aux = Metrics(self.test, self.prediction, threshold = i)
       recall.append(aux.sensitivity())
       false_positive_rate.append(aux.false_positive_rate())
@@ -113,13 +113,13 @@ class Graphs:
   def __init__(self, data):
     self.data = data #Lista que contiene tuplas de la forma: [(Y_test, prediction)]
   
-  def plot_ROC(self, fill = False, legend = True, double = False, threshold = False,methods=None):
+  def plot_ROC(self, fill = False, legend = True, double = False, threshold = False, methods=None, number_threshold = 100):
     if double is False:
       plt.style.use("ggplot")
       plt.figure(figsize = (9, 9))
     for i, (Y_test, prediction) in enumerate(self.data):
       metrics = Metrics(Y_test, prediction)
-      recall, false_positive_rate = metrics.ROC_Value()
+      recall, false_positive_rate = metrics.ROC_Value(number_threshold)
       AUC = metrics.auc()
 
       plt.plot(false_positive_rate, recall, label="ROC curve Model {} (AUC = {})".format(i + 1, AUC))
@@ -162,16 +162,14 @@ class Graphs:
     if legend:
       plt.legend(fontsize ='medium')
     plt.grid(False)
-    #if double is False:
-      #plt.show()
-
-  def plot_PRC(self, fill = False, legend = True, double = False, threshold = False, methods=None):
+            
+  def plot_PRC(self, fill = False, legend = True, double = False, threshold = False, methods=None, number_threshold = 100):
     if double is False:
       plt.style.use("ggplot")
       plt.figure(figsize = (9, 9))
     for i, (Y_test, prediction) in enumerate(self.data):
       metrics = Metrics(Y_test, prediction)
-      precision, recall = metrics.PRC_Value()
+      precision, recall = metrics.PRC_Value(number_threshold)
       AP = metrics.ap()
       plt.plot(recall, precision, label = "Precision-recall-curve Model {} (AP = {})".format(i+1, AP))
       
@@ -204,19 +202,48 @@ class Graphs:
     #if double is False:
       #plt.show()
 
-  def plot_all(self, fill = True, legend = True, threshold = False,methods=None):
+  def plot_all(self, fill = True, legend = True, threshold = False, methods=None, number_threshold = 100):
     plt.style.use("ggplot")
     plt.figure(figsize = (15, 20))
     plt.subplot(2,2,1)
-    self.plot_PRC(double=True, threshold = threshold, legend = legend,methods=methods)
+    self.plot_PRC(double=True, threshold = threshold, legend = legend,methods=methods, number_threshold=number_threshold)
     plt.subplot(2,2,2)
-    self.plot_ROC(double=True, threshold = threshold, legend = legend,methods=methods)
+    self.plot_ROC(double=True, threshold = threshold, legend = legend,methods=methods, number_threshold=number_threshold)
     if fill:
       plt.subplot(2,2,3)
-      self.plot_PRC(fill = True, double=True, legend = legend)
+      self.plot_PRC(fill = True, double=True, legend = legend, number_threshold=number_threshold)
       plt.subplot(2,2,4)
-      self.plot_ROC(fill = True, double=True, legend = legend)
-    #plt.show()
+      self.plot_ROC(fill = True, double=True, legend = legend, number_threshold=number_threshold)
+        
+  def plot_precision_recall_vs_threshold(self, legend = True, threshold = False, methods=None, number_threshold = 100):
+    plt.style.use("ggplot")
+    plt.figure(figsize = (9, 9))
+    for i, (Y_test, prediction) in enumerate(self.data):
+      metrics = Metrics(Y_test, prediction)
+      precisions, recalls = metrics.PRC_Value(number_threshold)
+      plt.title("Precision and Recall Scores (Positive class) vs. Decision threshold")
+      plt.plot(np.linspace(1.0, 0.0, num=len(precisions)-1), precisions[:-1],label="Precision")
+      plt.plot(np.linspace(1.0, 0.0, num=len(precisions)-1), recalls[:-1], "--",label="Recall")
+    
+      if threshold:
+            opt = Optimum(Y_test, prediction)
+            if "Distance PRC" in methods:
+                threshold_PRC, object_PRC = opt.optimum_for_PRC()
+                plt.scatter(threshold_PRC, object_PRC.precision(), marker='X',
+                        label = "Distance_PRC threshold {} ".format(threshold_PRC))
+                plt.scatter(threshold_PRC, object_PRC.sensitivity(), marker='X')
+                
+            if "Difference Recall-Precision" in methods:
+                threshold_difference_R_P, object_difference_R_P = opt.optimum_by_recall_precision_difference()
+                plt.scatter(threshold_difference_R_P, object_difference_R_P.precision(), marker='X',
+                        label = "Distance_PRC threshold {} ".format(threshold_difference_R_P))
+                plt.scatter(threshold_difference_R_P, object_difference_R_P.sensitivity(), marker='X')
+            
+      plt.ylabel("Score")
+      plt.xlabel("Decision Threshold")
+      plt.grid(False)
+      if legend:
+            plt.legend(fontsize ='medium')
   
 class Optimum:
 
