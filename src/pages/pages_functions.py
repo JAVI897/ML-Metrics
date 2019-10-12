@@ -105,7 +105,5 @@ def methods_Precision_and_Recall():
 def other_graphics(graphs, option_graphs, option_threshold,option_legend,methods, number_threshold):
     
     if option_graphs == "Precision and Recall vs Decision threshold":
-        g=graphs.plot_precision_recall_vs_threshold(legend = option_legend, threshold = option_threshold, 
+        return graphs.plot_precision_recall_vs_threshold_plotly(legend = option_legend, threshold = option_threshold, 
                                                     methods=methods, number_threshold = number_threshold)
-        return st.pyplot(g, transparent = False, optimize = True,
-                              quality = 100, bbox_inches="tight")

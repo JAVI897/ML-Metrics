@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly.graph_objects  as go
 import math
 import seaborn as sns
 
@@ -215,35 +216,63 @@ class Graphs:
       plt.subplot(2,2,4)
       self.plot_ROC(fill = True, double=True, legend = legend, number_threshold=number_threshold)
         
-  def plot_precision_recall_vs_threshold(self, legend = True, threshold = False, methods=None, number_threshold = 100):
-    plt.style.use("ggplot")
-    plt.figure(figsize = (9, 9))
-    for i, (Y_test, prediction) in enumerate(self.data):
-      metrics = Metrics(Y_test, prediction)
-      precisions, recalls = metrics.PRC_Value(number_threshold)
-      plt.title("Precision and Recall Scores (Positive class) vs. Decision threshold")
-      plt.plot(np.linspace(1.0, 0.0, num=len(precisions)-1), precisions[:-1],label="Precision")
-      plt.plot(np.linspace(1.0, 0.0, num=len(precisions)-1), recalls[:-1], "--",label="Recall")
-    
-      if threshold:
-            opt = Optimum(Y_test, prediction)
-            if "Distance PRC" in methods:
-                threshold_PRC, object_PRC = opt.optimum_for_PRC()
-                plt.scatter(threshold_PRC, object_PRC.precision(), marker='X',
-                        label = "Distance_PRC threshold {} ".format(threshold_PRC))
-                plt.scatter(threshold_PRC, object_PRC.sensitivity(), marker='X')
-                
-            if "Difference Recall-Precision" in methods:
-                threshold_difference_R_P, object_difference_R_P = opt.optimum_by_recall_precision_difference()
-                plt.scatter(threshold_difference_R_P, object_difference_R_P.precision(), marker='X',
-                        label = "Distance_PRC threshold {} ".format(threshold_difference_R_P))
-                plt.scatter(threshold_difference_R_P, object_difference_R_P.sensitivity(), marker='X')
             
-      plt.ylabel("Score")
-      plt.xlabel("Decision Threshold")
-      plt.grid(False)
-      if legend:
-            plt.legend(fontsize ='medium')
+  def plot_precision_recall_vs_threshold_plotly(self, legend = True, threshold = False, methods=None, number_threshold = 100):
+    fig = go.Figure()
+    for i, (Y_test, prediction) in enumerate(self.data):
+        
+            metrics = Metrics(Y_test, prediction)
+            precisions, recalls = metrics.PRC_Value(number_threshold)
+            fig.add_trace(go.Scatter(x=np.linspace(1.0, 0.0, num=len(precisions)-1), y=precisions[:-1],
+                    mode='lines',
+                    name='Precision'))
+            
+            fig.add_trace(go.Scatter(x=np.linspace(1.0, 0.0, num=len(precisions)-1), y=recalls[:-1],
+                    mode='lines',
+                    name='Recall'))
+            
+            if threshold:
+                opt = Optimum(Y_test, prediction)
+                if "Distance PRC" in methods:
+                    threshold_PRC, object_PRC = opt.optimum_for_PRC()
+                    fig.add_trace(go.Scatter(x=[threshold_PRC], y=[object_PRC.precision()], 
+                                             name="Distance_PRC threshold precision {} ".format(threshold_PRC),
+                                             mode = "markers",
+                                             line=dict(color='royalblue', width=4, dash='dot')))
+                    
+                    fig.add_trace(go.Scatter(x=[threshold_PRC], y=[object_PRC.sensitivity()],
+                                             showlegend=False,
+                                             line=dict(color='royalblue', width=4, dash='dot')))
+
+                if "Difference Recall-Precision" in methods:
+                    threshold_difference_R_P, object_difference_R_P = opt.optimum_by_recall_precision_difference()
+                    fig.add_trace(go.Scatter(x=[threshold_difference_R_P], y=[object_difference_R_P.precision()], 
+                                             name="Difference Recall-Precision threshold precision {} ".format(threshold_difference_R_P),
+                                             mode = "markers",
+                                             line=dict(color='firebrick', width=4, dash='dot')))
+                    
+                    fig.add_trace(go.Scatter(x=[threshold_difference_R_P], y=[object_difference_R_P.sensitivity()],
+                                             showlegend=False,
+                                             line=dict(color='firebrick', width=4, dash='dot')))
+                    
+            
+    # Edit the layout
+    if legend:
+        fig.update_layout(legend=dict(x=-.1, y=1.2),
+                              autosize=False,
+                              width=702,
+                              height=900,
+                              xaxis_title='Decision threshold',
+                              yaxis_title='Score')
+    else:
+        fig.update_layout(showlegend=legend,
+                              autosize=False,
+                              width=702,
+                              height=900,
+                              xaxis_title='Decision threshold',
+                              yaxis_title='Score')
+    return fig
+            
   
 class Optimum:
 

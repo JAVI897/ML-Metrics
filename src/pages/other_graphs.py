@@ -27,4 +27,5 @@ def write():
             methods_list = methods_Precision_and_Recall()
         else: 
             methods_list=None
-        other_graphics(graphs, option_graphs, option_threshold,option_legend,methods_list, number_threshold)
+        g = other_graphics(graphs, option_graphs, option_threshold,option_legend,methods_list, number_threshold)
+        st.plotly_chart(g)

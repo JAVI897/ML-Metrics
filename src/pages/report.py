@@ -26,6 +26,7 @@ def write():
     r= optimum.report(colormap=colormap)
     st.dataframe(r)
     
+    
     r_pie_=optimum.report(colormap=False)
     st.title("Confusion matrix percentages")
     option_method = st.selectbox("Method",df_methods_pie_chart["method"], index = 0)
