@@ -77,10 +77,9 @@ def methods_both():
 def grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods, number_threshold):
     
     if option_curve == "ROC Curve":
-        g=graphs.plot_ROC(threshold= option_threshold, fill=option_fill,methods=methods,
+        g=graphs.plot_ROC_plotly(threshold= option_threshold, fill=option_fill,methods=methods,
                           legend=option_legend, number_threshold = number_threshold)
-        return st.pyplot(g, transparent = False, optimize = True,
-                              quality = 100, bbox_inches="tight")
+        return g
         
     elif option_curve == "PRC Curve":
         g=graphs.plot_PRC_plotly(threshold= option_threshold, fill=option_fill, methods=methods,

@@ -30,7 +30,8 @@ def write():
             methods_list_roc= methods_roc() 
         else:
             methods_list_roc=None
-        grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_roc, number_threshold)
+        g = grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_roc, number_threshold)
+        st.plotly_chart(g)
     
         
     elif option_curve == "PRC Curve": 
