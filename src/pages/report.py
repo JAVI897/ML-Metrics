@@ -22,12 +22,17 @@ def write():
     st.title("Report")
     st.sidebar.title("Report")
     colormap = configuration_report()
-    optimum= metrics.Optimum(Y_Test_1,prediction_1)
-    r= optimum.report(colormap=colormap)
+    
+    @st.cache(ignore_hash=True)
+    def report(colormap):
+        optimum= metrics.Optimum(Y_Test_1,prediction_1)
+        r= optimum.report(colormap=colormap)
+        r_pie_= optimum.report(colormap=False)
+        return r, r_pie_
+        
+    r, r_pie_ = report(colormap)
     st.dataframe(r)
     
-    
-    r_pie_=optimum.report(colormap=False)
     st.title("Confusion matrix percentages")
     option_method = st.selectbox("Method",df_methods_pie_chart["method"], index = 0)
     st.plotly_chart(pie_chart(r_pie_,option_method))

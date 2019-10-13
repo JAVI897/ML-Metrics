@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects  as go
 import math
+import streamlit as st
 import seaborn as sns
 
 class Metrics:
@@ -370,7 +371,6 @@ class Optimum:
           threshold= i
     return threshold.round(2),object_min
   
-    
   def report(self, colormap = True):
     threshold_youden, object_youden = self.optimum_by_youden()
     threshold_f_score, object_f_score = self.optimum_by_f_score()
