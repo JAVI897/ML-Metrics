@@ -203,6 +203,42 @@ class Graphs:
     plt.grid(False)
     #if double is False:
       #plt.show()
+        
+  def plot_PRC_plotly(self, fill = False, legend = True, double = False, threshold = False, methods=None, number_threshold = 100):
+    fig = go.Figure()
+    for i, (Y_test, prediction) in enumerate(self.data):
+        metrics = Metrics(Y_test, prediction)
+        precision, recall = metrics.PRC_Value(number_threshold)
+        AP = metrics.ap()
+        linspace = list(np.linspace(0.0, 1.0, num=100))
+        fig.add_trace(go.Scatter(x=recall, y=precision, mode='lines', name="Precision-recall-curve Model {} (AP = {})".format(i+1, AP)))
+        fig.add_trace(go.Scatter(x=linspace, y = linspace, mode = 'lines', showlegend = False, line=dict(width=0.0)))
+        
+        if threshold:
+            opt = Optimum(Y_test, prediction)
+            if "Distance PRC" in methods:
+                threshold_PRC, object_PRC = opt.optimum_for_PRC()
+                fig.add_trace(go.Scatter(x=[object_PRC.sensitivity()], y=[object_PRC.precision()], 
+                                             name="Distance_PRC threshold {} Model {}".format(threshold_PRC, i+1),
+                                             mode = "markers",
+                                             line=dict(width=4, dash='dot')))
+                
+            if "Difference Recall-Precision" in methods:
+                threshold_difference_R_P, object_difference_R_P = opt.optimum_by_recall_precision_difference()
+                fig.add_trace(go.Scatter(x=[object_difference_R_P.sensitivity()], y=[object_difference_R_P.precision()], 
+                                             name="Difference_Recall_Precision threshold {} Model {}".format(threshold_difference_R_P, i+1),
+                                             mode = "markers",
+                                             line=dict(width=4, dash='dot')))
+            
+        if fill:
+            fig.add_trace(go.Scatter(x=recall, y=precision,
+                    mode='lines',
+                    name="Precision-recall-curve Model {} (AP = {})".format(i+1, AP),
+                    fill = 'tozeroy'))
+    fig.update_layout(showlegend=legend, legend=dict(x=-.1, y=1.2), autosize=False, 
+                      width=702, height=900, xaxis_title='Recall(sensitivity)', yaxis_title='Precision(PPV)')
+    return fig
+        
 
   def plot_all(self, fill = True, legend = True, threshold = False, methods=None, number_threshold = 100):
     plt.style.use("ggplot")
@@ -258,20 +294,8 @@ class Graphs:
                     
             
     # Edit the layout
-    if legend:
-        fig.update_layout(legend=dict(x=-.1, y=1.2),
-                              autosize=False,
-                              width=702,
-                              height=900,
-                              xaxis_title='Decision threshold',
-                              yaxis_title='Score')
-    else:
-        fig.update_layout(showlegend=legend,
-                              autosize=False,
-                              width=702,
-                              height=900,
-                              xaxis_title='Decision threshold',
-                              yaxis_title='Score')
+
+    fig.update_layout(showlegend=legend, legend=dict(x=-.1, y=1.2), autosize=False, width=702, height=900, xaxis_title='Decision threshold',yaxis_title='Score')
     return fig
             
   
