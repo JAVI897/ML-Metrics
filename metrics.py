@@ -164,7 +164,8 @@ class Graphs:
     if legend:
       plt.legend(fontsize ='medium')
     plt.grid(False)
-            
+
+  # ELIMINAR FUNCIÓN CUANDO ESTÉ RESUELTA PLOT_ALL CON PLOTLY
   def plot_PRC(self, fill = False, legend = True, double = False, threshold = False, methods=None, number_threshold = 100):
     if double is False:
       plt.style.use("ggplot")
