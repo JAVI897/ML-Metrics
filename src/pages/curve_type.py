@@ -50,7 +50,8 @@ def write():
             methods_list_both = methods_both()
         else:
             methods_list_both = None
-        grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_both, number_threshold)
+        g = grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_both, number_threshold)
+        st.plotly_chart(g)
         
         
         

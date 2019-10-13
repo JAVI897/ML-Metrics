@@ -6,6 +6,7 @@ import pandas as pd
 import plotly.graph_objects  as go
 import math
 import streamlit as st
+from plotly.subplots import make_subplots
 import seaborn as sns
 
 class Metrics:
@@ -115,7 +116,7 @@ class Graphs:
   def __init__(self, data):
     self.data = data #Lista que contiene tuplas de la forma: [(Y_test, prediction)]
 
-  def plot_ROC_plotly(self, fill = False, legend = True, double = False, threshold = False, methods=None, number_threshold = 100):
+  def plot_ROC_plotly(self, double = False, fill = False, legend = True, threshold = False, methods=None, number_threshold = 100):
     fig = go.Figure()
     for i, (Y_test, prediction) in enumerate(self.data):
         metrics = Metrics(Y_test, prediction)
@@ -160,102 +161,18 @@ class Graphs:
                     mode='lines',
                     name="ROC curve Model {} (AUC = {})".format(i+1, AUC),
                     fill = 'tozeroy'))
-
-    fig.update_layout(showlegend=legend, legend=dict(x=-.1, y=1.2), autosize=False, 
+            
+    if double == False:
+        if fill:
+            dicc = dict(x=-.1, y=1.06 + 0.03 * (len(methods) if methods != None else 0) + 0.05)
+        else:
+            dicc = dict(x=-.1, y=1.06 + 0.03 * (len(methods) if methods != None else 0))
+        fig.update_layout(showlegend=legend, legend=dicc, autosize=False, 
                       width=702, height=900, xaxis_title="false_positive_rate", yaxis_title="true_positive_rate")
     return fig
             
-  def plot_ROC(self, fill = False, legend = True, double = False, threshold = False, methods=None, number_threshold = 100):
-    if double is False:
-      plt.style.use("ggplot")
-      plt.figure(figsize = (9, 9))
-    for i, (Y_test, prediction) in enumerate(self.data):
-      metrics = Metrics(Y_test, prediction)
-      recall, false_positive_rate = metrics.ROC_Value(number_threshold)
-      AUC = metrics.auc()
-
-      plt.plot(false_positive_rate, recall, label="ROC curve Model {} (AUC = {})".format(i + 1, AUC))
-
-      if threshold: # Hay que revisarlo para que de los de youden o más o los que quiera el usuario
-        opt = Optimum(Y_test, prediction)
-        threshold_youden, object_max_youden = opt.optimum_by_youden()
-        threshold_f_score, object_f_score = opt.optimum_by_f_score()
-        threshold_ROC, object_ROC = opt.optimum_for_ROC()
-        threshold_difference_S_S, object_difference_S_S = opt.optimum_by_sensitivity_specificity_difference()
-        
-        
-        if "Youden" in methods:
-            plt.scatter(object_max_youden.false_positive_rate(), object_max_youden.sensitivity(), marker='X',
-                        label = "Youden threshold {} Model {}".format(threshold_youden, i+1))
-        
-        if "F-score" in methods:
-            plt.scatter(object_f_score.false_positive_rate(), object_f_score.sensitivity(), marker='X',
-                        label = "F-score threshold {} Model {}".format(threshold_f_score, i+1))
-        
-        if "Distance ROC" in methods:
-            plt.scatter(object_ROC.false_positive_rate(), object_ROC.sensitivity(), marker='X',
-                        label = "Distance_ROC threshold {} Model {}".format(threshold_ROC, i+1))
-        
-        if "Difference Sensitivity-Specificity" in methods:
-            plt.scatter(object_difference_S_S.false_positive_rate(), object_difference_S_S.sensitivity(), marker='X',
-                        label = "Sensitivity_Specificity_Difference threshold {} Model {}".format(threshold_difference_S_S, i+1))      
-     
-      if fill:
-        plt.fill_between(false_positive_rate, recall, alpha=0.5)
-        plt.plot(np.linspace(1.0, 0.0, num=100), np.linspace(1.0, 0.0, num=100), linestyle = "--", linewidth=1, color = "grey")
-      else:
-        plt.plot(np.linspace(1.0, 0.0, num=100), np.linspace(1.0, 0.0, num=100), linestyle = "--", linewidth=0.5, color = "grey")
-    
-    plt.title("ROC-curve")
-    if fill is True and double is True:
-      plt.title("")
-    plt.xlabel("false_positive_rate")
-    plt.ylabel("true_positive_rate")
-    if legend:
-      plt.legend(fontsize ='medium')
-    plt.grid(False)
-
-  # ELIMINAR FUNCIÓN CUANDO ESTÉ RESUELTA PLOT_ALL CON PLOTLY
-  def plot_PRC(self, fill = False, legend = True, double = False, threshold = False, methods=None, number_threshold = 100):
-    if double is False:
-      plt.style.use("ggplot")
-      plt.figure(figsize = (9, 9))
-    for i, (Y_test, prediction) in enumerate(self.data):
-      metrics = Metrics(Y_test, prediction)
-      precision, recall = metrics.PRC_Value(number_threshold)
-      AP = metrics.ap()
-      plt.plot(recall, precision, label = "Precision-recall-curve Model {} (AP = {})".format(i+1, AP))
-      
-      if threshold: 
-        opt = Optimum(Y_test, prediction)
-        threshold_PRC, object_PRC = opt.optimum_for_PRC()
-        threshold_difference_R_P, object_difference_R_P = opt.optimum_by_recall_precision_difference()
-        
-        if "Distance PRC" in methods:
-            plt.scatter(object_PRC.sensitivity(), object_PRC.precision(), marker='X',
-                        label = "Distance_PRC threshold {} Model {}".format(threshold_PRC, i+1))
-        else:pass
-        if "Difference Recall-Precision" in methods:
-            plt.scatter(object_difference_R_P.sensitivity(), object_difference_R_P.precision(), marker='X',
-                        label = "Difference_Recall_Precision threshold {} Model {}".format(threshold_difference_R_P, i+1))      
-        else:pass
-
-      if fill:
-        plt.fill_between(recall, precision, alpha=0.5)
-      plt.plot(np.linspace(0.0, 1.0, num=100), np.linspace(1.0, 0.0, num=100), linewidth=0.0)
-
-    plt.title("Precision-recall-curve")
-    if fill is True and double is True:
-      plt.title("")
-    plt.xlabel("Recall(sensitivity)")
-    plt.ylabel("Precision(PPV)")
-    if legend:
-      plt.legend(fontsize ='medium')
-    plt.grid(False)
-    #if double is False:
-      #plt.show()
-        
-  def plot_PRC_plotly(self, fill = False, legend = True, double = False, threshold = False, methods=None, number_threshold = 100):
+  
+  def plot_PRC_plotly(self, double = False, fill = False, legend = True, threshold = False, methods=None, number_threshold = 100):
     fig = go.Figure()
     for i, (Y_test, prediction) in enumerate(self.data):
         metrics = Metrics(Y_test, prediction)
@@ -286,25 +203,42 @@ class Graphs:
                     mode='lines',
                     name="Precision-recall-curve Model {} (AP = {})".format(i+1, AP),
                     fill = 'tozeroy'))
-    fig.update_layout(showlegend=legend, legend=dict(x=-.1, y=1.2), autosize=False, 
+            
+    if double == False:
+        if fill:
+            dicc = dict(x=-.1, y=1.06 + 0.03 * (len(methods) if methods != None else 0) + 0.05)
+        else:
+            dicc = dict(x=-.1, y=1.06 + 0.03 * (len(methods) if methods != None else 0))
+        fig.update_layout(showlegend=legend, legend=dicc, autosize=False, 
                       width=702, height=900, xaxis_title='Recall(sensitivity)', yaxis_title='Precision(PPV)')
     return fig
         
 
-  def plot_all(self, fill = True, legend = True, threshold = False, methods=None, number_threshold = 100):
-    plt.style.use("ggplot")
-    plt.figure(figsize = (15, 20))
-    plt.subplot(2,2,1)
-    self.plot_PRC(double=True, threshold = threshold, legend = legend,methods=methods, number_threshold=number_threshold)
-    plt.subplot(2,2,2)
-    self.plot_ROC(double=True, threshold = threshold, legend = legend,methods=methods, number_threshold=number_threshold)
-    if fill:
-      plt.subplot(2,2,3)
-      self.plot_PRC(fill = True, double=True, legend = legend, number_threshold=number_threshold)
-      plt.subplot(2,2,4)
-      self.plot_ROC(fill = True, double=True, legend = legend, number_threshold=number_threshold)
+
+  def plot_all_plotly(self, fill =  False, legend = True, threshold = False, methods=None, number_threshold = 100):
+    fig1 = self.plot_PRC_plotly(double = True, fill = fill, legend = legend, threshold = threshold, methods=methods, number_threshold = number_threshold)
+    fig2 = self.plot_ROC_plotly(double = True, fill = fill, legend = legend, threshold = threshold, methods=methods, number_threshold = number_threshold)
+    
+    fig = make_subplots(rows=1, cols=2, subplot_titles=('PRC', 'ROC'))
+    for j in fig1.data:
+        fig.append_trace(j, 1, 1)
+    for i in fig2.data:
+        fig.append_trace(i, 1, 2)
         
-            
+    if fill:
+        dicc = dict(x=-.1, y=1.2 + 0.05 * (len(methods) if methods != None else 0) + 0.1)
+    else:
+        dicc = dict(x=-.1, y=1.2 + 0.05 * (len(methods) if methods != None else 0))
+    fig.layout.update(showlegend=legend, legend=dicc, autosize=False, height=670, width=770)
+    fig.layout.xaxis1.update(title='Recall', showgrid=False)
+    fig.layout.yaxis1.update(title='Precision(PPV)', showgrid=False)
+    
+    fig.layout.xaxis2.update(title='true_positive_rate', showgrid=False)
+    fig.layout.yaxis2.update(title='false_positive_rate', showgrid=False)
+    return fig
+
+
+
   def plot_precision_recall_vs_threshold_plotly(self, legend = True, threshold = False, methods=None, number_threshold = 100):
     fig = go.Figure()
     for i, (Y_test, prediction) in enumerate(self.data):

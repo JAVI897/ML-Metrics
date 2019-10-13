@@ -87,10 +87,9 @@ def grafico(graphs, option_curve, option_threshold,option_fill,option_legend,met
         return g
         
     elif option_curve == "Both":
-        g=graphs.plot_all(threshold= option_threshold, fill=option_fill,methods=methods,
+        g=graphs.plot_all_plotly(threshold= option_threshold, fill=option_fill,methods=methods,
                           legend=option_legend, number_threshold = number_threshold)        
-        return st.pyplot(g, transparent = False, optimize = True,
-                              quality = 100, bbox_inches="tight")
+        return g
     
 
 #OTHER GRAPHS FUNCTIONS
