@@ -31,7 +31,7 @@ def write():
         else:
             methods_list_roc=None
         g = grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_roc, number_threshold)
-        st.plotly_chart(g)
+        st.plotly_chart(g,  width=702, height=900)
     
         
     elif option_curve == "PRC Curve": 
@@ -42,7 +42,7 @@ def write():
         else: 
             methods_list_prc=None
         g = grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_prc, number_threshold)
-        st.plotly_chart(g)
+        st.plotly_chart(g, width=702, height=900)
              
     elif option_curve == "Both":
         st.title("ROC and PRC curves")
@@ -51,7 +51,7 @@ def write():
         else:
             methods_list_both = None
         g = grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_both, number_threshold)
-        st.plotly_chart(g)
+        st.plotly_chart(g, height=670, width=770)
         
         
         

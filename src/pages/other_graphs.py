@@ -28,4 +28,4 @@ def write():
         else: 
             methods_list=None
         g = other_graphics(graphs, option_graphs, option_threshold,option_legend,methods_list, number_threshold)
-        st.plotly_chart(g)
+        st.plotly_chart(g, width=702, height=900)

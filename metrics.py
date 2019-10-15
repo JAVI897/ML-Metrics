@@ -164,9 +164,9 @@ class Graphs:
             
     if double == False:
         if fill:
-            dicc = dict(x=-.1, y=1.06 + 0.03 * (len(methods) if methods != None else 0) + 0.05)
+            dicc = dict(x=-.1, y=1.08 + 0.03 * (len(methods) if methods != None else 0) + 0.05)
         else:
-            dicc = dict(x=-.1, y=1.06 + 0.03 * (len(methods) if methods != None else 0))
+            dicc = dict(x=-.1, y=1.08 + 0.03 * (len(methods) if methods != None else 0))
         fig.update_layout(showlegend=legend, legend=dicc, autosize=False, 
                       width=702, height=900, xaxis_title="false_positive_rate", yaxis_title="true_positive_rate")
     return fig
@@ -206,9 +206,9 @@ class Graphs:
             
     if double == False:
         if fill:
-            dicc = dict(x=-.1, y=1.06 + 0.03 * (len(methods) if methods != None else 0) + 0.05)
+            dicc = dict(x=-.1, y=1.08 + 0.03 * (len(methods) if methods != None else 0) + 0.05)
         else:
-            dicc = dict(x=-.1, y=1.06 + 0.03 * (len(methods) if methods != None else 0))
+            dicc = dict(x=-.1, y=1.08 + 0.03 * (len(methods) if methods != None else 0))
         fig.update_layout(showlegend=legend, legend=dicc, autosize=False, 
                       width=702, height=900, xaxis_title='Recall(sensitivity)', yaxis_title='Precision(PPV)')
     return fig
@@ -226,9 +226,9 @@ class Graphs:
         fig.append_trace(i, 1, 2)
         
     if fill:
-        dicc = dict(x=-.1, y=1.2 + 0.05 * (len(methods) if methods != None else 0) + 0.1)
+        dicc = dict(x=-.1, y=1.25 + 0.05 * (len(methods) if methods != None else 0) + 0.1)
     else:
-        dicc = dict(x=-.1, y=1.2 + 0.05 * (len(methods) if methods != None else 0))
+        dicc = dict(x=-.1, y=1.25 + 0.05 * (len(methods) if methods != None else 0))
     fig.layout.update(showlegend=legend, legend=dicc, autosize=False, height=670, width=770)
     fig.layout.xaxis1.update(title='Recall', showgrid=False)
     fig.layout.yaxis1.update(title='Precision(PPV)', showgrid=False)
@@ -279,8 +279,8 @@ class Graphs:
                     
             
     # Edit the layout
-
-    fig.update_layout(showlegend=legend, legend=dict(x=-.1, y=1.2), autosize=False, width=702, height=900, xaxis_title='Decision threshold',yaxis_title='Score')
+    dicc = dict(x=-.1, y=1.08 + 0.05 * (len(methods) if methods != None else 0))
+    fig.update_layout(showlegend=legend, legend=dicc, autosize=False, width=702, height=900, xaxis_title='Decision threshold',yaxis_title='Score')
     return fig
             
   
