@@ -11,12 +11,15 @@ from src.pages.pages_functions import configuration, methods_prc, methods_roc, m
 def write():
     """Method used to write page in app.py"""
     
+    if len(data) == 0:
+        st.error("There's not data")
+        
     df_curves=pd.DataFrame({"curve":["ROC Curve","PRC Curve","Both"]})
     
     #Habría que cambiarlo de momento añadimos datos por aquí
-    prediction_1=np.load("data/prediction_1.npy")
-    Y_Test_1=np.load("data/Y_Test_1.npy")
-    data = [(Y_Test_1, prediction_1)]
+    #prediction_1=np.load("data/prediction_1.npy")
+    #Y_Test_1=np.load("data/Y_Test_1.npy")
+    #data = [(Y_Test_1, prediction_1)]
     graphs = metrics.Graphs(data)
     
     st.sidebar.title("Curve type")

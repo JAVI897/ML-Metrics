@@ -6,13 +6,16 @@ import numpy as np
 import src.st_extensions
 import plotly.graph_objects  as go
 from src.pages.pages_functions import configuration_report, pie_chart
+from src.pages.home import data
 
 def write():
     """Method used to write page in app.py"""
     
+    if len(data) == 0:
+        st.error("There's not data")
     #Habría que cambiarlo de momento añadimos datos por aquí
-    prediction_1=np.load("data/prediction_1.npy")
-    Y_Test_1=np.load("data/Y_Test_1.npy")
+    prediction_1=data[0][1]
+    Y_Test_1=data[0][0]
     
     
     df_methods_pie_chart= pd.DataFrame({"method":["Youden","F-score","Distance_ROC",

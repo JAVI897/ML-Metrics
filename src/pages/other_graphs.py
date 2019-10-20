@@ -5,9 +5,13 @@ import metrics
 import numpy as np
 import src.st_extensions
 from src.pages.pages_functions import configuration, methods_Precision_and_Recall, other_graphics, methods_tprate_and_fprate
+from src.pages.home import data
 
 def write():
     """Method used to write page in app.py"""
+    
+    if len(data) == 0:
+        st.error("There's not data")
     
     df_graphs=pd.DataFrame({"graphs":["Precision and Recall vs Decision threshold", 
                                       "True positive rate and False positive rate vs Decision threshold"]})
@@ -15,9 +19,9 @@ def write():
     #Sensitivity and 1 - specificity vs Decision threshold
     
     #Habría que cambiarlo de momento añadimos datos por aquí
-    prediction_1=np.load("data/prediction_1.npy")
-    Y_Test_1=np.load("data/Y_Test_1.npy")
-    data = [(Y_Test_1, prediction_1)]
+    #prediction_1=np.load("data/prediction_1.npy")
+    #Y_Test_1=np.load("data/Y_Test_1.npy")
+    #data = [(Y_Test_1, prediction_1)]
     graphs = metrics.Graphs(data)
     
     st.sidebar.title("Other graphs")
