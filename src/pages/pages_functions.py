@@ -99,8 +99,17 @@ def methods_Precision_and_Recall():
     option_method=st.multiselect("Methods:",df_methods_prc["model"])
     return option_method
 
+def methods_tprate_and_fprate():
+    df_methods_roc= pd.DataFrame({"model":["Youden","F-score", "Distance ROC","Difference Sensitivity-Specificity"]})
+    option_method=st.multiselect("Methods:",df_methods_roc["model"])
+    return option_method
+
 def other_graphics(graphs, option_graphs, option_threshold,option_legend,methods, number_threshold):
     
     if option_graphs == "Precision and Recall vs Decision threshold":
         return graphs.plot_precision_recall_vs_threshold_plotly(legend = option_legend, threshold = option_threshold, 
+                                                    methods=methods, number_threshold = number_threshold)
+    
+    elif option_graphs == "True positive rate and False positive rate vs Decision threshold":
+        return graphs.plot_tprate_fprate_vs_threshold_plotly(legend = option_legend, threshold = option_threshold, 
                                                     methods=methods, number_threshold = number_threshold)

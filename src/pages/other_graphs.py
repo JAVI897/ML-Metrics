@@ -4,12 +4,15 @@ import pandas as pd
 import metrics
 import numpy as np
 import src.st_extensions
-from src.pages.pages_functions import configuration, methods_Precision_and_Recall, other_graphics
+from src.pages.pages_functions import configuration, methods_Precision_and_Recall, other_graphics, methods_tprate_and_fprate
 
 def write():
     """Method used to write page in app.py"""
     
-    df_graphs=pd.DataFrame({"graphs":["Precision and Recall vs Decision threshold"]})
+    df_graphs=pd.DataFrame({"graphs":["Precision and Recall vs Decision threshold", 
+                                      "True positive rate and False positive rate vs Decision threshold"]})
+    
+    #Sensitivity and 1 - specificity vs Decision threshold
     
     #Habría que cambiarlo de momento añadimos datos por aquí
     prediction_1=np.load("data/prediction_1.npy")
@@ -29,3 +32,16 @@ def write():
             methods_list=None
         g = other_graphics(graphs, option_graphs, option_threshold,option_legend,methods_list, number_threshold)
         st.plotly_chart(g, width=702, height=900)
+        
+    elif option_graphs == "True positive rate and False positive rate vs Decision threshold":
+        st.title("True positive rate and False positive rate vs Decision threshold")
+        if option_threshold: 
+            methods_list = methods_tprate_and_fprate()
+        else: 
+            methods_list=None
+        g = other_graphics(graphs, option_graphs, option_threshold,option_legend,methods_list, number_threshold)
+        st.plotly_chart(g, width=702, height=900)
+        
+        
+        
+        

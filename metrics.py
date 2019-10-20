@@ -282,6 +282,72 @@ class Graphs:
     dicc = dict(x=-.1, y=1.08 + 0.05 * (len(methods) if methods != None else 0))
     fig.update_layout(showlegend=legend, legend=dicc, autosize=False, width=702, height=900, xaxis_title='Decision threshold',yaxis_title='Score')
     return fig
+
+  def plot_tprate_fprate_vs_threshold_plotly(self, legend = True, threshold = False, methods=None, number_threshold = 100):
+    fig = go.Figure()
+    for i, (Y_test, prediction) in enumerate(self.data):
+        
+            metrics = Metrics(Y_test, prediction)
+            recall, false_positive_rate = metrics.ROC_Value(number_threshold)
+            fig.add_trace(go.Scatter(x=np.linspace(1.0, 0.0, num=len(recall)-1), y=recall[:-1],
+                    mode='lines',
+                    name='Precision'))
+            
+            fig.add_trace(go.Scatter(x=np.linspace(1.0, 0.0, num=len(recall)-1), y=false_positive_rate[:-1],
+                    mode='lines',
+                    name='Recall'))
+            
+            if threshold:
+                opt = Optimum(Y_test, prediction)
+
+                if "Youden" in methods:
+                    threshold_youden, object_max_youden = opt.optimum_by_youden()
+                    fig.add_trace(go.Scatter(x=[threshold_youden], y=[object_max_youden.sensitivity()], 
+                                                 name= "Youden threshold {} Model {}".format(threshold_youden, i+1),
+                                                 mode = "markers",
+                                                 line=dict(color='violet', width=4, dash='dot')))
+                    
+                    fig.add_trace(go.Scatter(x=[threshold_youden], y=[object_max_youden.false_positive_rate()],
+                                                 showlegend=False,
+                                                 line=dict(color='violet', width=4, dash='dot')))
+
+                if "F-score" in methods:
+                    threshold_f_score, object_f_score = opt.optimum_by_f_score()
+                    fig.add_trace(go.Scatter(x=[threshold_f_score], y=[object_f_score.sensitivity()], 
+                                                 name= "F-score threshold {} Model {}".format(threshold_f_score, i+1),
+                                                 mode = "markers",
+                                                 line=dict(color='yellowgreen', width=4, dash='dot')))
+                    
+                    fig.add_trace(go.Scatter(x=[threshold_f_score], y=[object_f_score.false_positive_rate()], 
+                                                 showlegend=False,
+                                                 line=dict(color='yellowgreen', width=4, dash='dot')))
+
+                if "Distance ROC" in methods:
+                    threshold_ROC, object_ROC = opt.optimum_for_ROC()
+                    fig.add_trace(go.Scatter(x=[threshold_ROC], y=[object_ROC.sensitivity()], 
+                                                 name= "Distance_ROC threshold {} Model {}".format(threshold_ROC, i+1),
+                                                 mode = "markers",
+                                                 line=dict(color='goldenrod', width=4, dash='dot')))
+
+                    fig.add_trace(go.Scatter(x=[threshold_ROC], y=[object_ROC.false_positive_rate()], 
+                                                 showlegend = False,
+                                                 line=dict(color='goldenrod', width=4, dash='dot')))
+                
+                if "Difference Sensitivity-Specificity" in methods:
+                    threshold_difference_S_S, object_difference_S_S = opt.optimum_by_sensitivity_specificity_difference()
+                    fig.add_trace(go.Scatter(x=[threshold_difference_S_S], y=[object_difference_S_S.sensitivity()], 
+                                                 name= "Sensitivity_Specificity_Difference threshold {} Model {}".format(threshold_difference_S_S, i+1),
+                                                 mode = "markers",
+                                                 line=dict(color='turquoise', width=4, dash='dot')))
+                    
+                    fig.add_trace(go.Scatter(x=[threshold_difference_S_S], y=[object_difference_S_S.false_positive_rate()], 
+                                                 showlegend = False,
+                                                 line=dict(color='turquoise', width=4, dash='dot')))
+            
+    # Edit the layout
+    dicc = dict(x=-.1, y=1.08 + 0.05 * (len(methods) if methods != None else 0))
+    fig.update_layout(showlegend=legend, legend=dicc, autosize=False, width=702, height=900, xaxis_title='Decision threshold',yaxis_title='Score')
+    return fig
             
   
 class Optimum:
