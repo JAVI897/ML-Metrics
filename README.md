@@ -2,23 +2,34 @@
 © 2019
 
 # ML-Metrics
+
 A simple way to get automated threshold analysis using Streamlit.
 
 ![Muestra](https://raw.githubusercontent.com/JAVI897/ML-Metrics/master/muestra.gif "Muestra")
 
-# Requirements
+## Requirements
 
 * python 3.7 version
 * streamlit 0.48.1 version
 * plotly 4.2.1 version
 
-# Run
+## Run
 
 ```sh
 pip install streamlit plotly
 streamlit run https://raw.githubusercontent.com/JAVI897/ML-Metrics/master/app.py
 ```
 
-# Use
+## Getting Started
 
-Model predictions and ground truths must be saved as numpy arrays in the folder named as "data".
+Clone or download the repository.
+
+Place all of your predictions and your ground truths (saved as numpy arrays) in the data folder so that your data folder look something like this.
+
+```
+.
+├──data
+|   ├──prediction_1.npy
+|   ├──test_1.npy
+```
+
