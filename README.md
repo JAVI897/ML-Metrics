@@ -12,11 +12,13 @@ A simple way to get automated threshold analysis using Streamlit.
 * python 3.7 version
 * streamlit 0.48.1 version
 * plotly 4.2.1 version
+* numpy
+* pandas
 
 ## Run
 
 ```sh
-pip install streamlit plotly
+pip install streamlit plotly numpy pandas
 streamlit run https://raw.githubusercontent.com/JAVI897/ML-Metrics/master/app.py
 ```
 
