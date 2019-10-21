@@ -3,7 +3,7 @@
 # ML-Metrics
 A simple way to get automated threshold analysis using Streamlit.
 
-![Muestra](https://raw.githubusercontent.com/JAVI897/ML-Metrics/blob/master/muestra.gif "Muestra")
+![Muestra](https://raw.githubusercontent.com/JAVI897/ML-Metrics/master/muestra.gif "Muestra")
 
 # Requirements
 
