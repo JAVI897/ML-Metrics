@@ -18,7 +18,10 @@ A simple way to get automated threshold analysis using Streamlit.
 
 ```sh
 pip install streamlit plotly numpy pandas
-streamlit run https://raw.githubusercontent.com/JAVI897/ML-Metrics/master/app.py
+git clone https://github.com/JAVI897/ML-Metrics.git
+# cd into the project root folder
+cd ML-metrics
+streamlit run app.py
 ```
 
 ## Getting Started
