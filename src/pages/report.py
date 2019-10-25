@@ -28,7 +28,7 @@ def write():
         st.sidebar.title("Report")
         colormap = configuration_report()
 
-        @st.cache(ignore_hash=True)
+        @st.cache(allow_output_mutation=True)
         def report(colormap):
             optimum= metrics.Optimum(Y_Test_1,prediction_1)
             r= optimum.report(colormap=colormap)
