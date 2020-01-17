@@ -28,7 +28,7 @@ streamlit run app.py
 
 Clone or download the repository.
 
-Place all of your predictions and your ground truths (saved as numpy arrays) in the data folder so that your data folder look something like this.
+Place all of your predictions and your ground truths (saved as numpy arrays) in the data folder so that your data folder resembles this.
 
 ```
 .
