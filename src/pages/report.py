@@ -3,9 +3,10 @@ import streamlit as st
 import pandas as pd
 import metrics
 import numpy as np
+import matplotlib.pyplot as plt
 import src.st_extensions
 import plotly.graph_objects  as go
-from src.pages.pages_functions import configuration_report, pie_chart
+from src.pages.pages_functions import configuration_report, pie_chart, nested_pie_chart
 from src.pages.home import data
 
 def write():
@@ -43,3 +44,8 @@ def write():
         st.title("Confusion matrix percentages")
         option_method = st.selectbox("Method",df_methods_pie_chart["method"], index = 0)
         st.plotly_chart(pie_chart(r_pie_,option_method))
+        
+        st.title("Multi-level pie chart")
+        labels = list(r_pie_.index)
+        option_method2 = st.multiselect("Methods", options = labels, default = labels)
+        st.pyplot(nested_pie_chart(r_pie_,option_method2))

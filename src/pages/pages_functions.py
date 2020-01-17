@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.graph_objects  as go
 import pandas as pd
+import matplotlib.pyplot as plt
 
 #REPORT FUNCTIONS
 
@@ -24,6 +25,38 @@ def pie_chart(df,method):
     values = dic_values[method]
     fig = go.Figure(data=[go.Pie(labels=header_list, values=values, hole=.3)])
     return fig
+
+def nested_pie_chart(df, methods):
+    plt.figure(figsize=(15, 15))
+    df = df.loc[methods]
+    labels = list(df.index)
+    sizes = [500/ len(methods) for i in range(len(methods))]
+    df["Trues"] = df["TP"] + df["TN"]
+    df["Falses"] = df["FN"] + df["FP"]
+    labels_2level, sizes_2level = [], []
+    for index,value in df.iterrows():
+        v = list(df[["Trues", "Falses"]].loc[index].values)
+        maximum = sum(v)
+        for s in v:
+            labels_2level.append(s)
+            n_s = (s * sizes[0]) / maximum
+            sizes_2level.append(n_s)
+    colors = ["#003f5c", "#444e86", "#955196", "#dd5182", "#ff6e54", "#ffa600"]
+    colors_2level = ["#4CAF50", "#F44336", "#4CAF50", "#F44336", "#4CAF50", "#F44336", "#4CAF50", "#F44336",
+                    "#4CAF50", "#F44336", "#4CAF50", "#F44336"]
+
+    bigger = plt.pie(sizes, labels=labels, colors=colors,
+                     startangle=90, frame=True, textprops={'fontsize': 14})
+
+    smaller = plt.pie(sizes_2level, labels = labels_2level,
+                      colors=colors_2level, radius=0.7,
+                      startangle=90, labeldistance=0.8)
+    centre_circle = plt.Circle((0, 0), 0.5, color='white', linewidth=0)
+    fig = plt.gcf()
+    fig.gca().add_artist(centre_circle)
+    plt.axis('equal')
+    plt.tight_layout()
+    
 
 
 #CURVE TYPE FUNCTIONS
