@@ -23,7 +23,10 @@ def write():
         #prediction_1=np.load("data/prediction_1.npy")
         #Y_Test_1=np.load("data/Y_Test_1.npy")
         #data = [(Y_Test_1, prediction_1)]
-        graphs = metrics.Graphs(data)
+        keys = list(data.keys())
+        model = st.selectbox(label="Select a model:", options = keys, index = 0 )
+        
+        graphs = metrics.Graphs([data[model]])
 
         st.sidebar.title("Other graphs")
         option_graphs = st.sidebar.selectbox("Select",df_graphs["graphs"])
@@ -36,7 +39,7 @@ def write():
             else: 
                 methods_list=None
             g = other_graphics(graphs, option_graphs, option_threshold,option_legend,methods_list, number_threshold)
-            st.plotly_chart(g, width=702, height=900)
+            st.plotly_chart(g)
 
         elif option_graphs == "True positive rate and False positive rate vs Decision threshold":
             st.title("True positive rate and False positive rate vs Decision threshold")
@@ -45,7 +48,7 @@ def write():
             else: 
                 methods_list=None
             g = other_graphics(graphs, option_graphs, option_threshold,option_legend,methods_list, number_threshold)
-            st.plotly_chart(g, width=702, height=900)
+            st.plotly_chart(g)
         
         
         

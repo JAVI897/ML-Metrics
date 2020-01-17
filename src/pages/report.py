@@ -10,14 +10,16 @@ from src.pages.home import data
 
 def write():
     """Method used to write page in app.py"""
-    
     if len(data) == 0:
         st.error("There's not data")
         
     else:
         #Habría que cambiarlo de momento añadimos datos por aquí
-        prediction_1=data[0][1]
-        Y_Test_1=data[0][0]
+        keys = list(data.keys())
+        model = st.selectbox(label="Select a model:", options = keys, index = 0 )
+        
+        prediction=data[model][1]
+        ground_truth=data[model][0]
 
 
         df_methods_pie_chart= pd.DataFrame({"method":["Youden","F-score","Distance_ROC",
@@ -30,7 +32,7 @@ def write():
 
         @st.cache(allow_output_mutation=True)
         def report(colormap):
-            optimum= metrics.Optimum(Y_Test_1,prediction_1)
+            optimum= metrics.Optimum(ground_truth,prediction)
             r= optimum.report(colormap=colormap)
             r_pie_= optimum.report(colormap=False)
             return r, r_pie_

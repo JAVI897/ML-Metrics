@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects  as go
 import math
-import streamlit as st
 from plotly.subplots import make_subplots
 import seaborn as sns
 
@@ -113,9 +112,10 @@ class Metrics:
 
 class Graphs:
 
-  def __init__(self, data):
+  def __init__(self, data, names=None):
     self.data = data #Lista que contiene tuplas de la forma: [(Y_test, prediction)]
-
+    self.names = names #Lista que contiene los nombres de los modelos
+    
   def plot_ROC_plotly(self, double = False, fill = False, legend = True, threshold = False, methods=None, number_threshold = 100):
     fig = go.Figure()
     for i, (Y_test, prediction) in enumerate(self.data):
@@ -124,49 +124,51 @@ class Graphs:
         AUC = metrics.auc()
         linspace = list(np.linspace(0.0, 1.0, num=100))
         fig.add_trace(go.Scatter(x=linspace, y = linspace, mode = 'lines', showlegend = False, line=dict(width=0.5)))
-        fig.add_trace(go.Scatter(x=false_positive_rate, y=recall, mode='lines', name="ROC curve Model {} (AUC = {})".format(i + 1, AUC)))
+        fig.add_trace(go.Scatter(x=false_positive_rate, y=recall, mode='lines', name="ROC curve Model {} (AUC = {})".format(self.names[i], AUC)))
         if threshold:
             opt = Optimum(Y_test, prediction)
             
             if "Youden" in methods:
                 threshold_youden, object_max_youden = opt.optimum_by_youden()
                 fig.add_trace(go.Scatter(x=[object_max_youden.false_positive_rate()], y=[object_max_youden.sensitivity()], 
-                                             name= "Youden threshold {} Model {}".format(threshold_youden, i+1),
+                                             name= "Youden threshold {} Model {}".format(threshold_youden, self.names[i]),
                                              mode = "markers",
                                              line=dict(width=4, dash='dot')))
                 
             if "F-score" in methods:
                 threshold_f_score, object_f_score = opt.optimum_by_f_score()
                 fig.add_trace(go.Scatter(x=[object_f_score.false_positive_rate()], y=[object_f_score.sensitivity()], 
-                                             name= "F-score threshold {} Model {}".format(threshold_f_score, i+1),
+                                             name= "F-score threshold {} Model {}".format(threshold_f_score, self.names[i]),
                                              mode = "markers",
                                              line=dict(width=4, dash='dot')))
                 
             if "Distance ROC" in methods:
                 threshold_ROC, object_ROC = opt.optimum_for_ROC()
                 fig.add_trace(go.Scatter(x=[object_ROC.false_positive_rate()], y=[object_ROC.sensitivity()], 
-                                             name= "Distance_ROC threshold {} Model {}".format(threshold_ROC, i+1),
+                                             name= "Distance_ROC threshold {} Model {}".format(threshold_ROC, self.names[i]),
                                              mode = "markers",
                                              line=dict(width=4, dash='dot')))
                 
             if "Difference Sensitivity-Specificity" in methods:
                 threshold_difference_S_S, object_difference_S_S = opt.optimum_by_sensitivity_specificity_difference()
                 fig.add_trace(go.Scatter(x=[object_difference_S_S.false_positive_rate()], y=[object_difference_S_S.sensitivity()], 
-                                             name= "Sensitivity_Specificity_Difference threshold {} Model {}".format(threshold_difference_S_S, i+1),
+                                             name= "Sensitivity_Specificity_Difference threshold {} Model {}".format(threshold_difference_S_S, self.names[i]),
                                              mode = "markers",
                                              line=dict(width=4, dash='dot')))
                 
         if fill:
             fig.add_trace(go.Scatter(x=false_positive_rate, y=recall,
                     mode='lines',
-                    name="ROC curve Model {} (AUC = {})".format(i+1, AUC),
+                    name="ROC curve Model {} (AUC = {})".format(self.names[i], AUC),
                     fill = 'tozeroy'))
             
     if double == False:
         if fill:
-            dicc = dict(x=-.1, y=1.08 + 0.03 * (len(methods) if methods != None else 0) + 0.05)
+            dicc = dict(x=-.1, y=1.08 + 0.08 * (len(methods) if methods != None else 0) +
+                                        0.03 * (len(self.names) if len(self.names) > 1 else 0) )
         else:
-            dicc = dict(x=-.1, y=1.08 + 0.03 * (len(methods) if methods != None else 0))
+            dicc = dict(x=-.1, y=1.08 + 0.06 * (len(methods) if methods != None else 0) +
+                                 0.03 * (len(self.names) if len(self.names) > 1 else 0) )
         fig.update_layout(showlegend=legend, legend=dicc, autosize=False, 
                       width=702, height=900, xaxis_title="false_positive_rate", yaxis_title="true_positive_rate")
     return fig
@@ -179,7 +181,7 @@ class Graphs:
         precision, recall = metrics.PRC_Value(number_threshold)
         AP = metrics.ap()
         linspace = list(np.linspace(0.0, 1.0, num=100))
-        fig.add_trace(go.Scatter(x=recall, y=precision, mode='lines', name="Precision-recall-curve Model {} (AP = {})".format(i+1, AP)))
+        fig.add_trace(go.Scatter(x=recall, y=precision, mode='lines', name="Precision-recall-curve Model {} (AP = {})".format(self.names[i], AP)))
         fig.add_trace(go.Scatter(x=linspace, y = linspace, mode = 'lines', showlegend = False, line=dict(width=0.0)))
         
         if threshold:
@@ -187,28 +189,30 @@ class Graphs:
             if "Distance PRC" in methods:
                 threshold_PRC, object_PRC = opt.optimum_for_PRC()
                 fig.add_trace(go.Scatter(x=[object_PRC.sensitivity()], y=[object_PRC.precision()], 
-                                             name="Distance_PRC threshold {} Model {}".format(threshold_PRC, i+1),
+                                             name="Distance_PRC threshold {} Model {}".format(threshold_PRC, self.names[i]),
                                              mode = "markers",
                                              line=dict(width=4, dash='dot')))
                 
             if "Difference Recall-Precision" in methods:
                 threshold_difference_R_P, object_difference_R_P = opt.optimum_by_recall_precision_difference()
                 fig.add_trace(go.Scatter(x=[object_difference_R_P.sensitivity()], y=[object_difference_R_P.precision()], 
-                                             name="Difference_Recall_Precision threshold {} Model {}".format(threshold_difference_R_P, i+1),
+                                             name="Difference_Recall_Precision threshold {} Model {}".format(threshold_difference_R_P, self.names[i]),
                                              mode = "markers",
                                              line=dict(width=4, dash='dot')))
             
         if fill:
             fig.add_trace(go.Scatter(x=recall, y=precision,
                     mode='lines',
-                    name="Precision-recall-curve Model {} (AP = {})".format(i+1, AP),
+                    name="Precision-recall-curve Model {} (AP = {})".format(self.names[i], AP),
                     fill = 'tozeroy'))
             
     if double == False:
         if fill:
-            dicc = dict(x=-.1, y=1.08 + 0.03 * (len(methods) if methods != None else 0) + 0.05)
+            dicc = dict(x=-.1, y=1.08 + 0.08 * (len(methods) if methods != None else 0) +
+                                        0.03 * (len(self.names) if len(self.names) > 1 else 0) )
         else:
-            dicc = dict(x=-.1, y=1.08 + 0.03 * (len(methods) if methods != None else 0))
+            dicc = dict(x=-.1, y=1.08 + 0.06 * (len(methods) if methods != None else 0) +
+                                 0.03 * (len(self.names) if len(self.names) > 1 else 0) )
         fig.update_layout(showlegend=legend, legend=dicc, autosize=False, 
                       width=702, height=900, xaxis_title='Recall(sensitivity)', yaxis_title='Precision(PPV)')
     return fig
@@ -226,9 +230,11 @@ class Graphs:
         fig.append_trace(i, 1, 2)
         
     if fill:
-        dicc = dict(x=-.1, y=1.25 + 0.05 * (len(methods) if methods != None else 0) + 0.1)
+        dicc = dict(x=-.1, y=1.25 + 0.30 * (len(methods) if methods != None else 0) +
+                                    0.03 * (len(self.names) if len(self.names) > 1 else 0) )
     else:
-        dicc = dict(x=-.1, y=1.25 + 0.05 * (len(methods) if methods != None else 0))
+        dicc = dict(x=-.1, y=1.25 + 0.19 * (len(methods) if methods != None else 0) +
+                                    0.03 * (len(self.names) if len(self.names) > 1 else 0) )
     fig.layout.update(showlegend=legend, legend=dicc, autosize=False, height=670, width=770)
     fig.layout.xaxis1.update(title='Recall', showgrid=False)
     fig.layout.yaxis1.update(title='Precision(PPV)', showgrid=False)
@@ -303,7 +309,7 @@ class Graphs:
                 if "Youden" in methods:
                     threshold_youden, object_max_youden = opt.optimum_by_youden()
                     fig.add_trace(go.Scatter(x=[threshold_youden], y=[object_max_youden.sensitivity()], 
-                                                 name= "Youden threshold {} Model {}".format(threshold_youden, i+1),
+                                                 name= "Youden threshold {} Model {}".format(threshold_youden, self.names[i]),
                                                  mode = "markers",
                                                  line=dict(color='violet', width=4, dash='dot')))
                     
@@ -314,7 +320,7 @@ class Graphs:
                 if "F-score" in methods:
                     threshold_f_score, object_f_score = opt.optimum_by_f_score()
                     fig.add_trace(go.Scatter(x=[threshold_f_score], y=[object_f_score.sensitivity()], 
-                                                 name= "F-score threshold {} Model {}".format(threshold_f_score, i+1),
+                                                 name= "F-score threshold {} Model {}".format(threshold_f_score, self.names[i]),
                                                  mode = "markers",
                                                  line=dict(color='yellowgreen', width=4, dash='dot')))
                     
@@ -325,7 +331,7 @@ class Graphs:
                 if "Distance ROC" in methods:
                     threshold_ROC, object_ROC = opt.optimum_for_ROC()
                     fig.add_trace(go.Scatter(x=[threshold_ROC], y=[object_ROC.sensitivity()], 
-                                                 name= "Distance_ROC threshold {} Model {}".format(threshold_ROC, i+1),
+                                                 name= "Distance_ROC threshold {} Model {}".format(threshold_ROC, self.names[i]),
                                                  mode = "markers",
                                                  line=dict(color='goldenrod', width=4, dash='dot')))
 
@@ -336,7 +342,7 @@ class Graphs:
                 if "Difference Sensitivity-Specificity" in methods:
                     threshold_difference_S_S, object_difference_S_S = opt.optimum_by_sensitivity_specificity_difference()
                     fig.add_trace(go.Scatter(x=[threshold_difference_S_S], y=[object_difference_S_S.sensitivity()], 
-                                                 name= "Sensitivity_Specificity_Difference threshold {} Model {}".format(threshold_difference_S_S, i+1),
+                                                 name= "Sensitivity_Specificity_Difference threshold {} Model {}".format(threshold_difference_S_S, self.names[i]),
                                                  mode = "markers",
                                                  line=dict(color='turquoise', width=4, dash='dot')))
                     

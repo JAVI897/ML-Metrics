@@ -21,8 +21,12 @@ def write():
         #prediction_1=np.load("data/prediction_1.npy")
         #Y_Test_1=np.load("data/Y_Test_1.npy")
         #data = [(Y_Test_1, prediction_1)]
-        graphs = metrics.Graphs(data)
-
+        keys = list(data.keys())
+        model = st.multiselect(label="Select models:", options = keys, default = [keys[0]] )
+        metric_data = [v for k, v in data.items() if k in model]
+        model_names = [k for k, v in data.items() if k in model]
+        graphs = metrics.Graphs(metric_data, model_names)
+        
         st.sidebar.title("Curve type")
         option_curve= st.sidebar.selectbox("Select",df_curves["curve"])
         option_threshold, option_fill, option_legend, number_threshold= configuration()
@@ -35,7 +39,8 @@ def write():
             else:
                 methods_list_roc=None
             g = grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_roc, number_threshold)
-            st.plotly_chart(g,  width=702, height=900)
+            st.plotly_chart(g)
+            #st.plotly_chart(g,  width=702, height=900)
 
 
         elif option_curve == "PRC Curve": 
@@ -46,7 +51,8 @@ def write():
             else: 
                 methods_list_prc=None
             g = grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_prc, number_threshold)
-            st.plotly_chart(g, width=702, height=900)
+            st.plotly_chart(g)
+            #st.plotly_chart(g, width=702, height=900)
 
         elif option_curve == "Both":
             st.title("ROC and PRC curves")
@@ -55,7 +61,8 @@ def write():
             else:
                 methods_list_both = None
             g = grafico(graphs, option_curve, option_threshold,option_fill,option_legend,methods_list_both, number_threshold)
-            st.plotly_chart(g, height=670, width=770)
+            st.plotly_chart(g)
+            #st.plotly_chart(g, height=670, width=770)
         
         
         
