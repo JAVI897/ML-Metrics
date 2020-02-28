@@ -17,10 +17,10 @@ import src.pages.curve_type
 import src.pages.other_graphs
 
 PAGES = {
-    "Home": src.pages.home,
     "Report": src.pages.report,
     "Curve type": src.pages.curve_type,
-    "Other graphs": src.pages.other_graphs
+    "Other graphs": src.pages.other_graphs,
+	"Home": src.pages.home
 }
 
 selection = st.sidebar.radio("Go to", list(PAGES.keys()))
