@@ -1,8 +1,9 @@
-streamlit==0.55.0
+streamlit==0.56.0
 pandas
-bs4
 numpy
 seaborn
 matplotlib
+sklearn
+csv
+math
 plotly
-lxml
