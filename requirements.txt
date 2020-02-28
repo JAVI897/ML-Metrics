@@ -1,0 +1,8 @@
+streamlit==0.55.0
+pandas
+bs4
+numpy
+seaborn
+matplotlib
+plotly
+lxml
