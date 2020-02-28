@@ -4,6 +4,4 @@ numpy
 seaborn
 matplotlib
 sklearn
-csv
-math
 plotly
